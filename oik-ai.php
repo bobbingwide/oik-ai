@@ -1,9 +1,9 @@
 <?php
 /**
 Plugin Name: oik-ai
-Plugin URI: https://www.oik-plugins.com/oik-plugins/oik-ai
+Plugin URI: https://github.com/bobbingwide/oik-ai
 Description: AI for WordPress
-Version: 0.0.0
+Version: 0.1.0
 Author: bobbingwide
 Author URI: https://bobbingwide.com/
 License: GPLv2 or later
