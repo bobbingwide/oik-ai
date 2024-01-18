@@ -1,4 +1,10 @@
 <?php
+/**
+ * @copyright (C) Copyright Bobbing Wide 2023,2024
+ * @package oik-ai
+ *
+ * Interface to OpenAI from https://github.com/openai-php/client
+ */
 
 class Oik_AI {
 
