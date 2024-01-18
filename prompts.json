@@ -1,0 +1,32 @@
+
+	[
+		{
+			"label": "Excerpt",
+			"system": "Generate excerpt <= 50 words"
+		},
+		{
+			"label": "SEO focus keyphrase",
+			"system": "Generate SEO focus keyphrase"
+		},
+		{
+			"label":"Meta description",
+			"system":"Generate meta description <= 130 chars"
+		},
+		{
+			"label": "CSS",
+			"system": "Generate some CSS"
+		},
+		{
+			"label": "Post",
+			"system": "Generate a post using Gutenberg blocks"
+		},
+		{
+			"label": "Title",
+			"system": "Generate a title"
+		},
+		{ "label":  "Translate",
+		"system":  "Translate to "
+		}
+
+
+	]
