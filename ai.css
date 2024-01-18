@@ -1,0 +1,20 @@
+textarea { width: 100%;}
+
+div.history {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 5fr;
+    grid-template-rows: 1fr;
+    gap: 0.5% ;
+    /* grid-template-areas: ". . ."; */
+}
+
+div.history:hover,
+div.history div:hover { background-color: #969696;}
+
+select {
+    font-size: 20px;
+}
+
+div.oik-ai { width: 90%;
+    margin: 0 auto;
+}
