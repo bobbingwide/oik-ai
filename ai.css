@@ -18,3 +18,8 @@ select {
 div.oik-ai { width: 90%;
     margin: 0 auto;
 }
+
+input[type="submit"] {
+    padding: 10px 20px;
+    margin-right: 15px;
+}
