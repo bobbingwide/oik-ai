@@ -9,7 +9,7 @@ Author URI: https://bobbingwide.com/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Copyright 2023 Bobbing Wide (email : herb@bobbingwide.com )
+Copyright 2023,2024 Bobbing Wide (email : herb@bobbingwide.com )
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License version 2,
@@ -27,21 +27,38 @@ http://www.gnu.org/licenses/gpl-2.0.html
 */
 
 function oik_ai_loaded() {
+	// Do nothing for now.
+	if ( PHP_SAPI === 'cli' ) {
+		oik_ai_loaded_batch();
+	}
+}
+
+function oik_ai_loaded_batch() {
 	require_once( "classes/class-Oik-AI.php" );
 	$oik_ai =new Oik_AI();
+
 	$content=oik_ai_get_content();
+    $system_message = "You will be provided with a block of text, and your task is to summarize it in under 50 words.";
+	$oik_ai->set_system_message( $system_message );
 	$result =$oik_ai->chat( $content );
+	echo "Message:"  . PHP_EOL;
+	echo $content;
+	echo PHP_EOL;
+	echo "Result:" , PHP_EOL;
 	echo $result;
 }
+
 
 function oik_ai_get_content() {
 	$content="I took this photo of a collage of paintings at my mum’s care home since one of the paintings, the one in the middle, had SB on it. It wasn’t until later that I noticed the painting in the top right. I believe it was done by my sister Kate, and it’s of my mum’s cat, Sebastian.	
 Anyway, while editing the painting on my iPhone, I noticed that the Information button now supports AI. When I opened the Information box, several of the paintings were overlaid with an icon. Clicking on the icon performed a Look Up Artwork.
 To my surprise the 4th painting, middle left, was matched to 'Don’t Snark Back by Snark Notes'.";
 
+	/*
 	$content = "Sajt Burger is the Hungarian for cheese burger, where Sajt is pronounced a bit like shite.
 	 There are other countries where you can buy food or drink that doesn’t sound quite right. In France you can drink Pschitt, by Perrier.
 BTW. It should be spelt sajtburger – one word";
+	*/
 return $content;
 }
 
@@ -49,4 +66,3 @@ return $content;
 // Load Composer’s autoloader - can this be deferred until actually needed?
 require_once 'vendor/autoload.php';
 oik_ai_loaded();
-
