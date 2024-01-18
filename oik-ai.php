@@ -37,15 +37,48 @@ function oik_ai_loaded_batch() {
 	require_once( "classes/class-Oik-AI.php" );
 	$oik_ai =new Oik_AI();
 
-	$content=oik_ai_get_content();
-    $system_message = "You will be provided with a block of text, and your task is to summarize it in under 50 words.";
+	//oik_ai_invoke_chat();
+	oik_ai_invoke_image( $oik_ai);
+	//oik_ai_invoke_models( $oik_ai );
+
+}
+
+function oik_ai_invoke_chat( $oik_ai ) {
+	$content       =oik_ai_get_content();
+	$system_message="You will be provided with a block of text, and your task is to summarize it in under 50 words.";
 	$oik_ai->set_system_message( $system_message );
-	$result =$oik_ai->chat( $content );
-	echo "Message:"  . PHP_EOL;
+	$result=$oik_ai->chat( $content );
+	echo "Message:" . PHP_EOL;
 	echo $content;
 	echo PHP_EOL;
-	echo "Result:" , PHP_EOL;
+	echo "Result:", PHP_EOL;
 	echo $result;
+}
+
+function oik_ai_invoke_image( $oik_ai ) {
+	//$content = 'stupidly brilliant';
+	$system_message = 'stupidly brilliant';
+	$oik_ai->set_system_message( $system_message );
+	//$result = $oik_ai->image();
+	$result = $oik_ai->image_data();
+	echo "Message:"  . PHP_EOL;
+	echo $system_message;
+	echo PHP_EOL;
+	echo "Result:" , PHP_EOL;
+	echo strlen( $result ), PHP_EOL;
+	$file_name = oik_ai_get_image_file_name( $system_message );
+	$file = file_put_contents( $file_name, base64_decode( $result ) );
+	echo "File: $file_name $file", PHP_EOL;
+	//print_r( $file );
+}
+
+function oik_ai_get_image_file_name( $system_message ) {
+	$file_name = 'C:/apache/htdocs/ai/' . time() . '-' . $system_message . '.png';
+	return $file_name;
+}
+
+function oik_ai_invoke_models( $oik_ai ) {
+	$oik_ai->models();
 }
 
 
