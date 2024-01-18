@@ -191,7 +191,7 @@ class AI
 
     function get_savefile() {
         $file = [];
-        $file[] = __DIR__;
+        $file[] = dirname( __DIR__ );
         $file[] = 'saved';
         $file[] = bw_format_date( null, 'Ymd-His') . '.json';
         $filepath = implode( '/', $file );

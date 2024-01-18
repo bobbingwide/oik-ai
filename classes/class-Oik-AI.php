@@ -30,7 +30,7 @@ class Oik_AI {
 	}
 
     function getSettings() {
-        oik_require( 'class-ai-settings.php', 'oik-ai');
+        oik_require( 'classes/class-ai-settings.php', 'oik-ai');
 
         $AI_settings = new AI_settings();
         $this->OpenAIKey = $AI_settings->get_openai_key();

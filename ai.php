@@ -13,9 +13,9 @@ if ( defined( 'ABSPATH') ) {
 	require_once("inc/bobbset.php");
 }
 
-oik_require( "class-ai.php", "oik-ai" );
-oik_require( "class-ai-history.php", 'oik-ai' );
-oik_require( "class-ai-prompts.php", 'oik-ai' );
+oik_require( "classes/class-ai.php", "oik-ai" );
+oik_require( "classes/class-ai-history.php", 'oik-ai' );
+oik_require( "classes/class-ai-prompts.php", 'oik-ai' );
 
 echo '<body>';
 
