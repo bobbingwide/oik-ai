@@ -4,7 +4,7 @@
  * @copyright (C) Copyright Bobbing Wide 2023, 2024
  * @package bw/ai
  *
- * Experiment with OpenAI.
+ * Experiment with OpenAI to produce text content or images.
  */
 
 if ( defined( 'ABSPATH') ) {
@@ -18,9 +18,6 @@ oik_require( "classes/class-ai-history.php", 'oik-ai' );
 oik_require( "classes/class-ai-prompts.php", 'oik-ai' );
 
 echo '<body>';
-
-
-
 
 $ai = new ai();
 

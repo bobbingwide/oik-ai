@@ -60,7 +60,7 @@ function oik_ai_invoke_image( $oik_ai ) {
 	$system_message = 'stupidly brilliant';
 	$oik_ai->set_system_message( $system_message );
 	//$result = $oik_ai->image();
-	$result = $oik_ai->image_data();
+	$result = $oik_ai->image_data( '');
 	echo "Message:"  . PHP_EOL;
 	echo $system_message;
 	echo PHP_EOL;
@@ -73,7 +73,8 @@ function oik_ai_invoke_image( $oik_ai ) {
 }
 
 function oik_ai_get_image_file_name( $system_message ) {
-	$file_name = 'C:/apache/htdocs/ai/' . time() . '-' . $system_message . '.png';
+	$date = bw_format_date( null, 'Ymd-His');
+	$file_name = 'C:/apache/htdocs/ai/' . $date . '-' . $system_message . '.png';
 	return $file_name;
 }
 

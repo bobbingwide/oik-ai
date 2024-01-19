@@ -17,6 +17,7 @@ class AI
     private $ai_prompts;
     private $prompt_options;
     private $original_system_message;
+	private $image_save_dir = 'C:/apache/htdocs/ai/';  // @TODO should this use DOCPATH?
 
     function __construct()  {
         $this->system_message ='';
@@ -35,12 +36,17 @@ class AI
         echo '<link rel="stylesheet" href="ai.css" type="text/css" media="screen" />';
     }
 
-//
-// generate a meta description for the provided text.
-// The meta description should be fewer than 156 characters in length.
-
-// generate an excerpt for the provided text.
-// the excerpt should be no longer than 30 words
+	/**
+    * Displays the AI form.
+    * The standard prompts, which are loaded from prompts.json
+    * will do things such as:
+    *
+    * - generate a meta description for the provided text.
+    * - The meta description should be fewer than 156 characters in length.
+    *
+    * - generate an excerpt for the provided text.
+    * - the excerpt should be no longer than 30-50 words
+    */
     function form() {
         oik_require_lib( 'bobbforms');
         bw_form();
@@ -57,9 +63,12 @@ class AI
 	    br();
         e( isubmit( 'submit', 'Send') );
         //e( isubmit( 'save', 'Save') );
+	    e( ' ' );
+	    e ( isubmit( 'image', 'Generate image') );
 	    e( ' ');
         e( isubmit( 'history', 'Load history') );
         //e( isubmit( 'prompts', 'Prompts') );
+
 
         etag("form");
         bw_flush();
@@ -78,8 +87,14 @@ class AI
             $action = bw_array_get( $_POST, 'submit', null );
             if ( $action ) {
                 echo "Processing: " . $action;
-                $this->perform_get_excerpt();
+                $this->perform_get_response();
             }
+
+			$action = bw_array_get( $_POST, 'image', null );
+			if ( $action ) {
+				echo "Processing: " . $action;
+				$this->perform_get_image();
+			}
 
             $action = bw_array_get( $_POST, 'save', null );
             if ( $action ) {
@@ -101,7 +116,7 @@ class AI
 
         } else {
             if ( 'GET' === $_SERVER['REQUEST_METHOD']) {
-                echo "<p>It's a GET</p>";
+                //echo "<p>It's a GET</p>";
                 // These will both be empty arrays.
                 //print_r( $_GET );
                 //print_r( $_REQUEST );
@@ -141,24 +156,101 @@ class AI
 
     }
 
-    function perform_get_excerpt() {
+	/**
+	 * Gets the response.
+	 *
+	 * @return void
+	 */
+    function perform_get_response() {
         $this->set_message_fields();
         echo " for " . $this->system_message;
-        $this->get_excerpt();
+        $this->get_response();
 
     }
 
-    function get_excerpt() {
+	/**
+	 * Fetches the response from the AI chat
+	 *
+	 * @return void
+	 */
+    function get_response() {
         oik_require( 'vendor/autoload.php', 'oik-ai');
         oik_require( "classes/class-Oik-AI.php", 'oik-ai' );
         $this->oik_ai = $this->oik_ai ? $this->oik_ai : new Oik_AI();
         $this->oik_ai->set_system_message( $this->system_message );
-        //$content=oik_ai_get_content();
         $this->result =$this->oik_ai->chat( $this->user_message );
         //echo $result;
         $this->finish_reason = $this->oik_ai->get_finish_reason();
         $this->perform_save( true);
     }
+
+	/**
+	 * Gets an image from the AI chat.
+	 *
+	 * @return void
+	 */
+	function perform_get_image() {
+		$this->set_message_fields();
+		echo " for " . $this->system_message;
+		$this->get_image();
+
+	}
+	/**
+	 * Fetches an image from the AI chat.
+	 * @return void
+	 */
+	function get_image() {
+		oik_require( 'vendor/autoload.php', 'oik-ai');
+		oik_require( "classes/class-Oik-AI.php", 'oik-ai' );
+		$this->oik_ai = $this->oik_ai ? $this->oik_ai : new Oik_AI();
+		$this->oik_ai->set_system_message( $this->system_message );
+		$image_data = $this->oik_ai->image_data( $this->user_message );
+		//echo $result;
+		$this->finish_reason = $this->oik_ai->get_finish_reason();
+		$this->result = $this->save_image_file( $image_data );
+		$this->perform_save( true);
+		$this->display_image();
+
+	}
+
+	/**
+	 * Saves the base64 image as a .png file.
+	 *
+	 * @param $image_data
+	 * @return string - just the file name part.
+	 */
+	function save_image_file( $image_data) {
+		$file_name = $this->get_image_file_name( $this->system_message );
+		$file = file_put_contents( $this->image_save_dir . $file_name, base64_decode( $image_data ) );
+		//echo "File: $file_name $file", PHP_EOL;
+		//print_r( $file );
+		return $file_name;
+	}
+
+	function get_image_file_name( $system_message ) {
+		$date     =bw_format_date( null, 'Ymd-His' );
+		$file_name= $date . '-' . $system_message . '.png';
+		return $file_name;
+	}
+
+	function display_image() {
+		oik_require_lib( 'bobbforms');
+		$image_url = 'http';
+		// Does it matter what it's set to? "on" or 1 **?**
+		if ( isset( $_SERVER["HTTPS"] ) ) {
+			$image_url .= "s";
+		}
+		$image_url .= "://";
+		$image_url .= $_SERVER["SERVER_NAME"];
+		$image_url .= '/ai/';
+		$image_url .= $this->result;
+		//echo $image_url . PHP_EOL;
+
+		$img = retimage( null, $image_url);
+		//$link = retlink( null, , $this->result );
+		echo $img;
+		//echo $link;
+	}
 
     function perform_save( $details = false)
     {

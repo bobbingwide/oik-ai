@@ -134,13 +134,15 @@ class Oik_AI {
 		return $url;
 	}
 
-	function image_data() {
+	function image_data( $user_message ) {
+		$prompt = $this->get_prompt( $user_message );
 		$result = $this->client->images()->create([
 			'model' => 'dall-e-3',
-			'prompt' => $this->system_message,
+			'prompt' => $prompt,
 			'quality' => 'hd',
 			'n' => 1,
-			'size' => '1792x1024',
+			'size' => '1024x1024',
+			//'style' => 'natural',
 			'response_format' => 'b64_json',
 		]);
 		//print_r( $result );
@@ -148,6 +150,10 @@ class Oik_AI {
 
 		return $image;
 
+	}
+
+	function get_prompt( $user_message ) {
+		return $this->system_message . ' ' . $user_message;
 	}
 
 }
