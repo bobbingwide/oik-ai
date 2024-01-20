@@ -13,10 +13,6 @@
 			"system":"Generate meta description <= 130 chars"
 		},
 		{
-			"label": "CSS",
-			"system": "Generate some CSS"
-		},
-		{
 			"label": "Post",
 			"system": "Generate a post using Gutenberg blocks"
 		},
@@ -24,9 +20,21 @@
 			"label": "Title",
 			"system": "Generate a title"
 		},
-		{ "label":  "Translate",
-		"system":  "Translate to "
+		{
+			"label": "Comment",
+			"system": "Generate a comment"
+		},
+		{ 
+			"label":  "Translate",
+			"system":  "Translate to "
+		},
+		{
+			"label": "CSS",
+			"system": "Generate some CSS"
+		},
+		{
+			"label": "PHP",
+			"system": "Generate some PHP"
 		}
-
 
 	]
