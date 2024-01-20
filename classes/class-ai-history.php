@@ -82,12 +82,25 @@ class AI_history
         $row = [];
         $row['file'] = $this->sediv( $this->get_file_actions( $file ), 'file' );
         $row['system'] = $this->sediv( $this->result['system'], 'system' );
-        $row['user'] = $this->sediv( $this->result['user'], 'user' );
-        $row['result'] = $this->sediv( $this->result['result'], 'result' );
+		// We need to strip HTML from the user and result fields
+	    //require_once( ABSPATH . '/wp-includes/formatting.php');
+	    $esc_user = $this->abbreviate( $this->result['user'] );
+        $row['user'] = $this->sediv( $esc_user, 'user' );
+		$esc_result = $this->abbreviate( $this->result['result'] );
+        $row['result'] = $this->sediv( $esc_result, 'result' );
 
         bw_gridrow( $row, 'history');
 
     }
+
+	function abbreviate( $long_text ) {
+		$length = strlen( $long_text);
+		//$dots = $length > 256 ? '...' : '';
+		$text = substr( $long_text, 0, 256 );
+		$text = htmlspecialchars( $text );
+		$text .= ( $length > 256 ) ? ' ...' : '';
+		return $text;
+	}
 
     function get_file_actions( $file ) {
         $file_actions = $file;
@@ -118,5 +131,6 @@ class AI_history
         // Pass the values to class AI via the $_POST
         $_POST['system_message'] = $this->result['system'];
         $_POST['user_message'] = $this->result['user'];
+		$_POST['assistant_message'] = $this->result['result'];
     }
 }
