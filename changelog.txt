@@ -1,8 +1,14 @@
 == Upgrade Notice ==
+= 0.1.0 = 
+Now supports predefined prompts for common requests.
+
 = 0.0.0 =
 Prototype version demonstrating basic functionality.
 
 == Changelog ==
+= 0.1.0 = 
+* Added: Build an excerpt, meta description generator using AI #2 
+
 = 0.0.0 =
 * Added: Basic functionality calling OpenAI 
 * Tested: With PHP 8.3
