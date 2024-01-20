@@ -64,7 +64,11 @@ class AI
         e( isubmit( 'submit', 'Send') );
         //e( isubmit( 'save', 'Save') );
 	    e( ' ' );
-	    e ( isubmit( 'image', 'Generate image') );
+	    e ( isubmit( 'image', 'Image: 1024x1024') );
+	    e( ' ' );
+	    e ( isubmit( '1024x1792', 'Portrait: 1024x1792') );
+	    e( ' ' );
+	    e ( isubmit( '1792x1024', 'Landscape: 1792x1024') );
 	    e( ' ');
         e( isubmit( 'history', 'Load history') );
         //e( isubmit( 'prompts', 'Prompts') );
@@ -95,6 +99,18 @@ class AI
 				echo "Processing: " . $action;
 				$this->perform_get_image();
 			}
+
+	        $action = bw_array_get( $_POST, '1024x1792', null );
+	        if ( $action ) {
+		        echo "Processing: " . $action;
+		        $this->perform_get_image( '1024x1792');
+	        }
+
+	        $action = bw_array_get( $_POST, '1792x1024', null );
+	        if ( $action ) {
+		        echo "Processing: " . $action;
+		        $this->perform_get_image( '1792x1024' );
+	        }
 
             $action = bw_array_get( $_POST, 'save', null );
             if ( $action ) {
@@ -153,6 +169,7 @@ class AI
     function set_message_fields() {
         $this->system_message = $this->maybe_override_system_message();
         $this->user_message = bw_array_get( $_POST, 'user_message', null );
+		$this->result = bw_array_get( $_POST, 'assistant_message', null );
 
     }
 
@@ -189,21 +206,22 @@ class AI
 	 *
 	 * @return void
 	 */
-	function perform_get_image() {
+	function perform_get_image( $size='1024x1024') {
 		$this->set_message_fields();
 		echo " for " . $this->system_message;
-		$this->get_image();
+		$this->get_image( $size );
 
 	}
 	/**
 	 * Fetches an image from the AI chat.
 	 * @return void
 	 */
-	function get_image() {
+	function get_image( $size ) {
 		oik_require( 'vendor/autoload.php', 'oik-ai');
 		oik_require( "classes/class-Oik-AI.php", 'oik-ai' );
 		$this->oik_ai = $this->oik_ai ? $this->oik_ai : new Oik_AI();
 		$this->oik_ai->set_system_message( $this->system_message );
+		$this->oik_ai->set_size( $size );
 		$image_data = $this->oik_ai->image_data( $this->user_message );
 		//echo $result;
 		$this->finish_reason = $this->oik_ai->get_finish_reason();
@@ -310,6 +328,7 @@ class AI
             $this->ai_history = $this->ai_history ? $this->ai_history : new AI_history();
             $this->ai_history->load( $load );
             $this->set_message_fields();
+
 
         }
     }
