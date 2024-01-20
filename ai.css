@@ -2,7 +2,7 @@ textarea { width: 100%;}
 
 div.history {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 5fr;
+    grid-template-columns: 2fr 2fr 3fr 3fr;
     grid-template-rows: 1fr;
     gap: 0.5% ;
     /* grid-template-areas: ". . ."; */
