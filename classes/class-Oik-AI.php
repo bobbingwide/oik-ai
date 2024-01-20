@@ -12,6 +12,7 @@ class Oik_AI {
 	private $client;
 	private $result;
     private $system_message;
+	private $size;
 
 	function __construct() {
         $this->getSettings();
@@ -25,7 +26,6 @@ class Oik_AI {
 
 	function getKey() {
 		//$this->OpenAIKey = getenv( "OPENAI_KEY" );
-
 		return $this->OpenAIKey;
 	}
 
@@ -141,15 +141,17 @@ class Oik_AI {
 			'prompt' => $prompt,
 			'quality' => 'hd',
 			'n' => 1,
-			'size' => '1024x1024',
+			'size' => $this->size,
 			//'style' => 'natural',
 			'response_format' => 'b64_json',
 		]);
 		//print_r( $result );
 		$image = $result->data[0]['b64_json'];
-
 		return $image;
+	}
 
+	function set_size( $size ) {
+		$this->size = $size;
 	}
 
 	function get_prompt( $user_message ) {
