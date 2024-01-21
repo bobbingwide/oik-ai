@@ -27,5 +27,7 @@ $ai->process_form();
 
 $ai->form();
 
+$ai->previous_results();
+
 echo '</body>';
 echo '</html>';
