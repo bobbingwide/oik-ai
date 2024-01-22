@@ -147,6 +147,10 @@ class Oik_AI {
 		]);
 		//print_r( $result );
 		$image = $result->data[0]['b64_json'];
+
+		//$result->data[0]['b64_json'] = '';
+		//print_r( $result );
+		//$this->result = $result;
 		return $image;
 	}
 
@@ -156,6 +160,14 @@ class Oik_AI {
 
 	function get_prompt( $user_message ) {
 		return $this->system_message . ' ' . $user_message;
+	}
+
+	/**
+	 * I don't think we can get the revised prompt.
+	 * Will have to think of another way to request a crayon drawing without being shown the crayons
+	 */
+	function get_revised_prompt() {
+		//print_r( $this->result );
 	}
 
 }
