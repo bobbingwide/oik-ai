@@ -10,7 +10,7 @@ class AI
 
     private $system_message;
     private $user_message;
-    private $result;
+    private $result;  // aka assistant_message
     private $finish_reason;
     private $oik_ai;
     private $ai_history;
@@ -18,11 +18,13 @@ class AI
     private $prompt_options;
     private $original_system_message;
 	private $image_save_dir = 'C:/apache/htdocs/ai/';  // @TODO should this use DOCPATH?
+	private $image_name;
 
     function __construct()  {
         $this->system_message ='';
         $this->original_system_message = '';
         $this->user_message = "";
+		$this->image_name = '';
         $this->result = '';
         $this->finish_reason = '- not yet available';
         $this->oik_ai = null;
@@ -56,9 +58,10 @@ class AI
         $this->display_prompts();
 		bw_is_table( false );
 		//stag( 'table' );
-	    BW_::bw_textarea( "system_message", 80, "System message", $this->original_system_message, 3 );
-        BW_::bw_textarea( 'user_message', 80, 'User message. Type or paste your message content here', trim( $this->user_message, '"') , 10 );
+	    BW_::bw_textarea( "system_message", 80, "System message", $this->original_system_message, 3, ['#class' => 'system_message'] );
+        BW_::bw_textarea( 'user_message', 80, 'User message. Type or paste your message content here', trim( $this->user_message, '"') , 10, ['#class' => 'user_message'] );
         BW_::bw_textarea( 'assistant_message', 80, "Assistant message {$this->finish_reason} ", trim( $this->result, '"' ), 10 );
+		BW_::bw_textfield( 'image_name', 80, "Image file name", $this->image_name );;
         //etag( 'table' );
 	    br();
         e( isubmit( 'submit', 'Send') );
@@ -170,8 +173,22 @@ class AI
         $this->system_message = $this->maybe_override_system_message();
         $this->user_message = bw_array_get( $_POST, 'user_message', null );
 		$this->result = bw_array_get( $_POST, 'assistant_message', null );
-
+		//$image_name = bw_array_get( $_POST, 'image_name', $this->system_message);
+	    $this->set_image_name();
     }
+
+	function set_image_name() {
+		$image_name = bw_array_get( $_POST, 'image_name', '');
+		if ( '' === $image_name ) {
+			if ( '.png' === substr( $this->result, -4 )) {
+				$image_name=substr( $this->result, 16, - 4 );
+			}
+		}
+		if ( '' === $image_name) {
+			$image_name=$this->system_message;
+		}
+		$this->image_name = strtolower( trim( $image_name ) );
+	}
 
 	/**
 	 * Gets the response.
@@ -227,7 +244,8 @@ class AI
 		$this->finish_reason = $this->oik_ai->get_finish_reason();
 		$this->result = $this->save_image_file( $image_data );
 		$this->perform_save( true);
-		$this->display_image();
+		$this->display_image( $this->result );
+		//$this->oik_ai->get_revised_prompt();
 
 	}
 
@@ -238,20 +256,20 @@ class AI
 	 * @return string - just the file name part.
 	 */
 	function save_image_file( $image_data) {
-		$file_name = $this->get_image_file_name( $this->system_message );
+		$file_name = $this->get_image_file_name( $this->image_name );
 		$file = file_put_contents( $this->image_save_dir . $file_name, base64_decode( $image_data ) );
 		//echo "File: $file_name $file", PHP_EOL;
 		//print_r( $file );
 		return $file_name;
 	}
 
-	function get_image_file_name( $system_message ) {
+	function get_image_file_name( $image_name ) {
 		$date     =bw_format_date( null, 'Ymd-His' );
-		$file_name= $date . '-' . $system_message . '.png';
+		$file_name= $date . '-' . strtolower( $image_name ) . '.png';
 		return $file_name;
 	}
 
-	function display_image() {
+	function display_image( $image_file ) {
 		oik_require_lib( 'bobbforms');
 		$image_url = 'http';
 		// Does it matter what it's set to? "on" or 1 **?**
@@ -261,12 +279,12 @@ class AI
 		$image_url .= "://";
 		$image_url .= $_SERVER["SERVER_NAME"];
 		$image_url .= '/ai/';
-		$image_url .= $this->result;
+		$image_url .= $image_file; // $this->result;
 		//echo $image_url . PHP_EOL;
 
 		$img = retimage( null, $image_url);
 		//$link = retlink( null, , $this->result );
-		echo $img;
+		e( $img );
 		//echo $link;
 	}
 
@@ -328,6 +346,7 @@ class AI
             $this->ai_history = $this->ai_history ? $this->ai_history : new AI_history();
             $this->ai_history->load( $load );
             $this->set_message_fields();
+			$this->maybe_display_image();
 
 
         }
@@ -341,5 +360,40 @@ class AI
     function display_prompts() {
         $this->ai_prompts->display_prompts();
     }
+
+	/**
+	 * Displays image history.
+	 *
+	 * Displays matching images based on the system_message
+	 * @return void
+	 */
+	function previous_results() {
+		if ( empty( $this->image_name )) {
+			return;
+		}
+		$mask = '*' . trim( $this->image_name ) . '.png';
+		//echo $mask;
+		$files = glob( $this->image_save_dir . $mask );
+		//print_r( $files );
+		sdiv('thumbnail');
+		foreach ( $files as $file ) {
+
+			$this->display_image( basename( $file ) );
+		}
+		ediv();
+		bw_flush();
+	}
+
+	function maybe_display_image() {
+		if ( '.png' !== substr( $this->result, -4 )) {
+			return;
+		}
+
+		if ( file_exists( $this->image_save_dir . $this->result ) ) {
+			$this->display_image( $this->result );
+		}
+
+
+	}
 
 }
