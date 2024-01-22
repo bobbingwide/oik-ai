@@ -43,3 +43,11 @@ img { display: block;
     width: 75%;
     margin: 0 auto 20px auto;
 }
+
+div label { margin-top: 20px; padding-top: 10px; }
+
+div.system_message textarea, div.user_message textarea {
+    border: 1px solid #a1a1a1;;
+    border-radius: 16px;
+    padding: 10px;
+}
