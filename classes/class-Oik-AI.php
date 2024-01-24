@@ -13,6 +13,7 @@ class Oik_AI {
 	private $result;
     private $system_message;
 	private $size;
+	private $style = 'vivid';
 
 	function __construct() {
         $this->getSettings();
@@ -83,6 +84,17 @@ class Oik_AI {
         return $reason;
     }
 
+	/**
+	 * Returns the details.
+	 *
+	 * Notes:
+	 * - When the request is for an image then the details includes the `b64_json` field
+	 * - which can be a few megabytes.
+	 * - It also includes the revisedPrompt, which perform_save() extracts separately.
+	 *
+	 *
+	 * @return mixed
+	 */
     function get_details() {
         //print_r( $this->result);
         return $this->result;
@@ -142,7 +154,7 @@ class Oik_AI {
 			'quality' => 'hd',
 			'n' => 1,
 			'size' => $this->size,
-			//'style' => 'natural',
+			'style' => $this->style,
 			'response_format' => 'b64_json',
 		]);
 		//print_r( $result );
@@ -150,24 +162,31 @@ class Oik_AI {
 
 		//$result->data[0]['b64_json'] = '';
 		//print_r( $result );
-		//$this->result = $result;
+		$this->result = $result;
 		return $image;
 	}
 
 	function set_size( $size ) {
 		$this->size = $size;
 	}
+	function set_style( $style='vivid') {
+		$this->style = $style;
+	}
 
 	function get_prompt( $user_message ) {
 		return $this->system_message . ' ' . $user_message;
 	}
 
+
+
 	/**
-	 * I don't think we can get the revised prompt.
-	 * Will have to think of another way to request a crayon drawing without being shown the crayons
+	 * Return the revised_prompt.
+	 *
+	 * Available since openai-php/client v0.7.9
 	 */
 	function get_revised_prompt() {
 		//print_r( $this->result );
+		return $this->result->data[0]['revised_prompt'];
 	}
 
 }

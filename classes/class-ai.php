@@ -12,6 +12,7 @@ class AI
     private $user_message;
     private $result;  // aka assistant_message
     private $finish_reason;
+	private $revised_prompt;
     private $oik_ai;
     private $ai_history;
     private $ai_prompts;
@@ -27,6 +28,7 @@ class AI
 		$this->image_name = '';
         $this->result = '';
         $this->finish_reason = '- not yet available';
+		$this->revised_prompt = '';
         $this->oik_ai = null;
         $this->ai_history = null;
         $this->ai_prompts = null;
@@ -61,6 +63,7 @@ class AI
 	    BW_::bw_textarea( "system_message", 80, "System message", $this->original_system_message, 3, ['#class' => 'system_message'] );
         BW_::bw_textarea( 'user_message', 80, 'User message. Type or paste your message content here', trim( $this->user_message, '"') , 10, ['#class' => 'user_message'] );
         BW_::bw_textarea( 'assistant_message', 80, "Assistant message {$this->finish_reason} ", trim( $this->result, '"' ), 10 );
+		BW_::p( $this->revised_prompt );
 		BW_::bw_textfield( 'image_name', 80, "Image file name", $this->image_name );;
         //etag( 'table' );
 	    br();
@@ -240,13 +243,10 @@ class AI
 		$this->oik_ai->set_system_message( $this->system_message );
 		$this->oik_ai->set_size( $size );
 		$image_data = $this->oik_ai->image_data( $this->user_message );
-		//echo $result;
-		$this->finish_reason = $this->oik_ai->get_finish_reason();
+		$this->revised_prompt = $this->oik_ai->get_revised_prompt();
 		$this->result = $this->save_image_file( $image_data );
-		$this->perform_save( true);
+		$this->perform_save();
 		$this->display_image( $this->result );
-		//$this->oik_ai->get_revised_prompt();
-
 	}
 
 	/**
@@ -293,6 +293,8 @@ class AI
         $output = ["system" => $this->system_message,
             "user" => $this->user_message,
             "result" => $this->result,
+	        "revised_prompt" => $this->revised_prompt,
+	        "image_name" => $this->image_name
             //"details" => $this->oik_ai->get_details()
         ];
         if ($details && $this->oik_ai ) {
