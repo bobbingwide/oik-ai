@@ -63,7 +63,8 @@ class AI
 	    BW_::bw_textarea( "system_message", 80, "System message", $this->original_system_message, 3, ['#class' => 'system_message'] );
         BW_::bw_textarea( 'user_message', 80, 'User message. Type or paste your message content here', trim( $this->user_message, '"') , 10, ['#class' => 'user_message'] );
         BW_::bw_textarea( 'assistant_message', 80, "Assistant message {$this->finish_reason} ", trim( $this->result, '"' ), 10 );
-		BW_::p( $this->revised_prompt );
+        $revised_prompt = bw_array_get( $_POST, 'revised_prompt', $this->revised_prompt );
+		BW_::p( $revised_prompt );
 		BW_::bw_textfield( 'image_name', 80, "Image file name", $this->image_name );;
         //etag( 'table' );
 	    br();
@@ -188,10 +189,15 @@ class AI
 			}
 		}
 		if ( '' === $image_name) {
-			$image_name=$this->system_message;
+			$image_name= $this->sanitize_image_name( $this->system_message );
 		}
 		$this->image_name = strtolower( trim( $image_name ) );
 	}
+
+    function sanitize_image_name( $image_name ) {
+        $image_name = str_replace( ['<', '=', '.', '?' ], '', $image_name );
+        return $image_name;
+    }
 
 	/**
 	 * Gets the response.
@@ -306,7 +312,10 @@ class AI
 
     }
     function perform_history() {
+        $this->set_message_fields();
         $this->ai_history = $this->ai_history ? $this->ai_history : new AI_history();
+        $this->ai_history->set_filter( 'system_message', $this->system_message );
+        $this->ai_history->set_filter( 'image_name', $this->image_name );
         $this->ai_history->display();
 
     }

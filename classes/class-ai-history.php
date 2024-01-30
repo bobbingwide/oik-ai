@@ -15,6 +15,8 @@ class AI_history
          'Generate <=50 words'
         ];
     private $prompts = '';
+    private $filters = [];
+    private $filtered = [];
 
     function display() {
         $this->list_files();
@@ -61,12 +63,18 @@ class AI_history
 
     function list_files() {
         $this->files = glob( 'saved/*.json');
+        p( "Count: " . count( $this->files ));
         foreach ( $this->files as $file ) {
             //br();
             //e( $file );
             $this->load_file( $file);
-            $this->display_result( $file);
-
+            if ( $this->filter_match() ) {
+                $this->filtered[$file] = $this->result;
+            }
+        }
+        p( "Filtered: " . count( $this->filtered ));
+        foreach ( $this->filtered as $file => $this->result ) {
+            $this->display_result($file);
         }
         bw_flush();
     }
@@ -132,5 +140,35 @@ class AI_history
         $_POST['system_message'] = $this->result['system'];
         $_POST['user_message'] = $this->result['user'];
 		$_POST['assistant_message'] = $this->result['result'];
+        $_POST['revised_prompt'] = $this->result['revised_prompt'] ?? '';
+    }
+
+    function set_filter( $field, $value ) {
+       $this->filters[ $field ] = $value;
+    }
+
+    /**
+     * Filters the result to see if it should be loaded.
+     *
+     * @return true
+     */
+    function filter_match() {
+        $match = true;
+        $sm_filter = strlen( $this->filters['system_message']);
+        $in_filter = strlen( $this->filters['image_name']);
+        if ( $sm_filter || $in_filter ) {
+            $match = false;
+            if ( $sm_filter ) {
+                if (0 === strpos($this->result['system'], $this->filters['system_message'])) {
+                    $match = true;
+                }
+            }
+            if ( $in_filter ) {
+                if (false !== strpos($this->result['result'], $this->filters['image_name'])) {
+                    $match = true;
+                }
+            }
+        }
+        return $match;
     }
 }
